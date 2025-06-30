@@ -1,20 +1,36 @@
 package com.kapil.stocks.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.kapil.stocks.data.dummy.StockData
-import com.kapil.stocks.data.model.Stock
+import androidx.lifecycle.viewModelScope
+import com.kapil.stocks.constants.Constants
+import com.kapil.stocks.data.model.StockDetails
+import com.kapil.stocks.network.ApiService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class StockViewModel : ViewModel() {
-    private val _gainers = MutableLiveData<List<Stock>>()
-    val gainers: LiveData<List<Stock>> get() = _gainers
+    // private stuff
+    private val _stockdetails: MutableStateFlow<StockDetails?> = MutableStateFlow(null)
+    private val _authStatus: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    private val _losers = MutableLiveData<List<Stock>>()
-    val losers: LiveData<List<Stock>> get() = _losers
+    init {
+        fetchStockDetails(stockName = "META")
+    }
 
-    fun loadData() {
-        _gainers.value = StockData.getTopGainers()
-        _losers.value = StockData.getTopLosers()
+    // Public
+    val stockDetails: StateFlow<StockDetails?> = _stockdetails.asStateFlow();
+
+    fun fetchStockDetails(stockName: String){
+        Log.d(Constants.TAG, "fetch stock details called")
+        viewModelScope.launch {
+            val stockApiInstance = ApiService.getStocksApi()
+            val response = stockApiInstance.getStockDetails("META", "AII507GDUFZTDWJ3");
+            _stockdetails.emit(response.body())
+            Log.d(Constants.TAG, "API response ${response} ${response.body()}")
+
+        }
     }
 }
