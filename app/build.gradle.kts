@@ -15,9 +15,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        // Inside android { defaultConfig { ... } }
-        buildConfigField("String", "ALPHA_VANTAGE_API_KEY", "\"FB3R35XFKQUBW7T0\"")
-
     }
 
     buildTypes {
@@ -33,7 +30,6 @@ android {
     //  Enable ViewBinding
     buildFeatures {
         viewBinding = true
-        buildConfig = true
     }
 
 
@@ -49,6 +45,7 @@ android {
 dependencies {
 
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
