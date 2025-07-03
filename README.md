@@ -46,7 +46,7 @@ This app allows users to track stock prices, view top gainers & losers, add stoc
 
 1. **Clone the Repository**
 ```bash
-git clone https://github.com/your-username/StocksApp.git
+git clone https://github.com/kapil-maan/StocksApp.git
 ```
 
 
