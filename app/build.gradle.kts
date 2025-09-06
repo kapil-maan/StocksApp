@@ -43,6 +43,11 @@ android {
 }
 
 dependencies {
+
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     // Core AndroidX libraries
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -65,4 +70,5 @@ dependencies {
     // Android Instrumentation Testing
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
 }
