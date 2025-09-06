@@ -1,15 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".StockDetailActivity">
+    android:padding="16dp"
+    tools:context=".ui.activities.StockDetailsActivity">
 
-
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Stocks Details" />
-</LinearLayout>
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="12dp">
+
+        <!-- Stock Name -->
+        <TextView
+            android:id="@+id/textStockName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stock Name"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Stock Price -->
+        <TextView
+            android:id="@+id/textStockPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stock Price"
+            android:textSize="20sp"
+            android:textColor="@android:color/holo_green_dark"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Placeholder for Line Chart -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Bookmark icon (can be used to add/remove from watchlist) -->
+        <ImageView
+            android:id="@+id/imageBookmark"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/btn_star_big_off"
+            android:contentDescription="Bookmark"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+</ScrollView>
