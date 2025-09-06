@@ -15,6 +15,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Inside android { defaultConfig { ... } }
+        buildConfigField("String", "ALPHA_VANTAGE_API_KEY", "\"FB3R35XFKQUBW7T0\"")
+
     }
 
     buildTypes {
@@ -30,6 +33,7 @@ android {
     //  Enable ViewBinding
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
 
