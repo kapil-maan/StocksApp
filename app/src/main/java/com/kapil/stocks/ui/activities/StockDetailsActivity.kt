@@ -1,26 +1,33 @@
 package com.kapil.stocks.ui.activities
 
+import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.kapil.stocks.R
+import com.kapil.stocks.adapters.WatchlistSelectionAdapter
 import com.kapil.stocks.constants.Constants
 import com.kapil.stocks.data.model.WatchList
 import com.kapil.stocks.databinding.ActivityStockDetailBinding
 import com.kapil.stocks.services.SharedPreferences
 import com.kapil.stocks.viewmodel.StockViewModel
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class StockDetailsActivity : AppCompatActivity() {
 
@@ -30,11 +37,9 @@ class StockDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         _binding = ActivityStockDetailBinding.inflate(layoutInflater)
         setContentView(_binding.root)
 
-        // Apply insets
         ViewCompat.setOnApplyWindowInsetsListener(_binding.parent) { view, insets ->
             val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
             view.setPadding(0, statusBarInsets.top, 0, 0)
@@ -42,8 +47,6 @@ class StockDetailsActivity : AppCompatActivity() {
         }
 
         companyName = intent?.getStringExtra(Constants.COMPANY_NAME).toString()
-        Log.d(Constants.TAG, "got company name in detail activity: ${companyName}")
-
         viewModel = ViewModelProvider(this)[StockViewModel::class.java]
 
         initData()
@@ -58,21 +61,17 @@ class StockDetailsActivity : AppCompatActivity() {
         _binding.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.set_watchlist -> {
-                    val existingData = SharedPreferences.readWatchlistData(this)
-                    val existingWatchList = if (existingData.size > 0) existingData[0] else WatchList(name = "WatchList 1", stocks = emptyList())
-                    val newData = existingWatchList.copy(stocks = existingWatchList.stocks.plus(viewModel.stockDetails.value!!))
-                    SharedPreferences.saveWatchlistData(this, listOf(newData))
-                    Log.d(Constants.TAG, "final watchlist data ${newData} ${existingData}")
-                    Toast.makeText(this, "Item saved in watchlist", Toast.LENGTH_SHORT).show()
+                    showAddToWatchlistDialog()
                     true
                 }
-
-                else -> { true}
+                else -> { true }
             }
         }
+
         lifecycleScope.launch {
             viewModel.isLoading.collect { isVisible ->
-                if(isVisible == true){
+                // ⭐ THIS IS THE CORRECTED LINE ⭐
+                if (isVisible == true) {
                     _binding.progressBar.visibility = View.VISIBLE
                     _binding.stockDetailContainer.visibility = View.GONE
                 } else {
@@ -81,22 +80,16 @@ class StockDetailsActivity : AppCompatActivity() {
                 }
             }
         }
+
         lifecycleScope.launch {
             viewModel.stockDetails.collect { data ->
                 if (data != null) {
-                    // Header Info
                     _binding.tvCompanyName.text = data.Name
                     _binding.tvSymbolExchange.text = "${data.Symbol}, ${data.Exchange}"
                     _binding.tvPrice.text = "$${data.PERatio}"
-
-                    // Description
                     _binding.tvDescription.text = data.Description
-
-                    // Tags
                     _binding.tvSector.text = "Sector: ${data.Sector}"
                     _binding.tvIndustry.text = "Industry: ${data.Industry}"
-
-                    // Chart
                     setupChart()
                 }
             }
@@ -107,104 +100,95 @@ class StockDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setStat(label: String, value: String) {
-//        val statBinding = ItemStatBinding.inflate(LayoutInflater.from(this))
-//        statBinding.tvStatLabel.text = label
-//        statBinding.tvStatValue.text = value
-//        _binding.gridStats.addView(statBinding.root)
+    private fun showAddToWatchlistDialog() {
+        val stockToAdd = viewModel.stockDetails.value
+        if (stockToAdd == null) {
+            Toast.makeText(this, "Stock details not loaded yet.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog_add_to_watchlist)
+
+        val etNewWatchlistName = dialog.findViewById<EditText>(R.id.et_new_watchlist_name)
+        val rvExistingWatchlists = dialog.findViewById<RecyclerView>(R.id.rv_existing_watchlists)
+        val btnSave = dialog.findViewById<Button>(R.id.btn_save_to_watchlists)
+
+        val existingWatchlists = SharedPreferences.readWatchlistData(this)
+        val selectionAdapter = WatchlistSelectionAdapter(existingWatchlists)
+        rvExistingWatchlists.layoutManager = LinearLayoutManager(this)
+        rvExistingWatchlists.adapter = selectionAdapter
+
+        // In StockDetailsActivity.kt
+
+        btnSave.setOnClickListener {
+            val selectedNames = selectionAdapter.selectedWatchlistNames
+            val newName = etNewWatchlistName.text.toString().trim()
+            if (newName.isNotEmpty()) {
+                selectedNames.add(newName)
+            }
+
+            if (selectedNames.isEmpty()) {
+                Toast.makeText(this, "Please select or create a watchlist.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val watchlistsMap = SharedPreferences.readWatchlistData(this)
+                .associateBy { it.name.lowercase(Locale.ROOT) }
+                .toMutableMap()
+
+            for (targetName in selectedNames) {
+                val key = targetName.lowercase(Locale.ROOT)
+                val existingList = watchlistsMap[key]
+
+                if (existingList != null) {
+                    // --- ⭐ THIS IS THE CORRECTED LOGIC ⭐ ---
+                    val stockAlreadyExists = existingList.stocks.any { it.Symbol == stockToAdd.Symbol }
+                    if (!stockAlreadyExists) {
+                        // Only update the list IF the stock is NOT already in it
+                        val updatedList = existingList.copy(stocks = existingList.stocks + stockToAdd)
+                        watchlistsMap[key] = updatedList
+                    }
+                    // If the stock already exists, we do nothing, preventing duplicates.
+
+                } else {
+                    // NEW WATCHLIST: Create it and add it to the map.
+                    val newList = WatchList(name = targetName, stocks = listOf(stockToAdd))
+                    watchlistsMap[key] = newList
+                }
+            }
+
+            val finalListToSave = watchlistsMap.values.toList()
+
+            // (Optional but Recommended) Add the debug log from the previous step to always check what you're saving
+            Log.d("WATCHLIST_DEBUG", "--- FINAL LIST TO SAVE ---")
+            finalListToSave.forEach { watchlist ->
+                Log.d("WATCHLIST_DEBUG", "Name: ${watchlist.name}, Stocks: ${watchlist.stocks.map { it.Symbol }.distinct()}") // Using distinct() for cleaner logging
+            }
+
+            SharedPreferences.saveWatchlistData(this, finalListToSave)
+
+            Toast.makeText(this, "Saved to watchlist(s)!", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun setupChart() {
         val entries = ArrayList<Entry>().apply {
-            add(Entry(0f, 150f))
-            add(Entry(1f, 160f))
-            add(Entry(2f, 155f))
-            add(Entry(3f, 165f))
-            add(Entry(4f, 170f))
-            add(Entry(5f, 175f))
+            add(Entry(0f, 150f)); add(Entry(1f, 160f)); add(Entry(2f, 155f));
+            add(Entry(3f, 165f)); add(Entry(4f, 170f)); add(Entry(5f, 175f))
         }
 
         val dataSet = LineDataSet(entries, "Price Trend").apply {
-            color = Color.BLUE
-            valueTextColor = Color.BLACK
-            circleRadius = 4f
-            lineWidth = 2f
-            setDrawFilled(true)
-            fillColor = Color.CYAN
+            color = Color.BLUE; valueTextColor = Color.BLACK; circleRadius = 4f
+            lineWidth = 2f; setDrawFilled(true); fillColor = Color.CYAN
         }
 
         val lineData = LineData(dataSet)
         _binding.lineChart.data = lineData
-        _binding.lineChart.setTouchEnabled(true)
-        _binding.lineChart.setPinchZoom(true)
+        _binding.lineChart.setTouchEnabled(true); _binding.lineChart.setPinchZoom(true)
         _binding.lineChart.description = Description().apply { text = "" }
         _binding.lineChart.invalidate()
     }
 }
-
-
-
-//package com.kapil.stocks.ui.activities
-//
-//import android.os.Bundle
-//import androidx.appcompat.app.AppCompatActivity
-//import androidx.lifecycle.ViewModelProvider
-//import androidx.lifecycle.lifecycleScope
-//import com.kapil.stocks.databinding.ActivityStockDetailBinding
-//import com.kapil.stocks.viewmodel.StockViewModel
-//import kotlinx.coroutines.launch
-//
-//class StockDetailsActivity : AppCompatActivity() {
-//
-//    //    private lateinit var stockNameTextView: TextView
-////    private lateinit var stockPriceTextView: TextView
-//    private lateinit var viewModel: StockViewModel
-//    private lateinit var _binding: ActivityStockDetailBinding
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        _binding =  ActivityStockDetailBinding.inflate(layoutInflater)
-//        setContentView(_binding.root)
-//
-//        viewModel = ViewModelProvider(this)[StockViewModel::class.java]
-//
-//        setupListeners()
-//
-//        // get activity arguments
-//        // symbol = read data
-//        lifecycleScope.launch {
-////            viemodel.fetchStockDetails(stockName)
-//        }
-//
-////        stockNameTextView = findViewById(R.id.textStockName)
-////        stockPriceTextView = findViewById(R.id.textStockPrice)
-//
-//        // Safely receive stock data
-////        @Suppress("DEPRECATION")
-////        val stock: Stock? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-////            intent.getSerializableExtra("stock", Stock::class.java)
-////        } else {
-////            intent.getSerializableExtra("stock") as? Stock
-////        }
-////
-////        if (stock != null) {
-////            stockNameTextView.text = stock.name
-////            stockPriceTextView.text = stock.price
-////        } else {
-////            Toast.makeText(this, "Stock data not found!", Toast.LENGTH_SHORT).show()
-////            finish()
-////        }
-//    }
-//
-//    private fun setupListeners(){
-//        lifecycleScope.launch {
-//            viewModel.stockDetails.collect { data ->
-//                if(data !== null){
-//                    _binding.textStockName.text = data.Symbol
-//                    _binding.textStockPrice.text = data.PERatio
-//                }
-//
-//            }
-//        }
-//    }
-//}

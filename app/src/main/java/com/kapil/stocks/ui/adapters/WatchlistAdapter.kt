@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kapil.stocks.R
-import com.kapil.stocks.data.model.Stock
 import com.kapil.stocks.data.model.WatchList
 
-class WatchlistAdapter(private val onClick: () -> Unit) :
+
+class WatchlistAdapter(private val onClick: (WatchList) -> Unit) :
     RecyclerView.Adapter<WatchlistAdapter.StockViewHolder>() {
 
     private var _data: List<WatchList> = emptyList()
@@ -26,7 +26,8 @@ class WatchlistAdapter(private val onClick: () -> Unit) :
     override fun onBindViewHolder(holder: StockViewHolder, position: Int) {
         val watchlist = _data[position]
         holder.name.text = watchlist.name
-        holder.itemView.setOnClickListener { onClick() }
+
+        holder.itemView.setOnClickListener { onClick(watchlist) }
     }
 
     fun updateData(list: List<WatchList>){
