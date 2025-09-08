@@ -1,5 +1,7 @@
 package com.kapil.stocks.data.model
 
+import com.google.gson.annotations.SerializedName
+
 data class StockDetails(
     val Symbol: String,
     val AssetType: String,
@@ -46,10 +48,20 @@ data class StockDetails(
     val EVToRevenue: String,
     val EVToEBITDA: String,
     val Beta: String,
+
+    // ⭐ ANNOTATIONS ADDED HERE TO FIX GSON SERIALIZATION ⭐
+    @SerializedName("52WeekHigh")
     val `52WeekHigh`: String,
+
+    @SerializedName("52WeekLow")
     val `52WeekLow`: String,
+
+    @SerializedName("50DayMovingAverage")
     val `50DayMovingAverage`: String,
+
+    @SerializedName("200DayMovingAverage")
     val `200DayMovingAverage`: String,
+
     val SharesOutstanding: String,
     val SharesFloat: String,
     val PercentInsiders: String,

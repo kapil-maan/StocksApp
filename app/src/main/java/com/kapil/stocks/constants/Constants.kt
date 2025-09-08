@@ -7,4 +7,5 @@ object Constants {
     const val LIST_TYPE = "listType"
     const val WATCHLIST_PREF_FILE = "watchlist"
     const val WATCHLIST_DATA = "watchlistData"
+    const val WATCHLIST_NAME = "WATCHLIST_NAME"
 }
