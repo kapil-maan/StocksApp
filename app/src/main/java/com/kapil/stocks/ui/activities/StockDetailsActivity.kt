@@ -1,34 +1,24 @@
 package com.kapil.stocks.ui.activities
 
-import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.kapil.stocks.R
-import com.kapil.stocks.adapters.WatchlistSelectionAdapter
 import com.kapil.stocks.constants.Constants
-import com.kapil.stocks.data.model.WatchList
 import com.kapil.stocks.databinding.ActivityStockDetailBinding
-import com.kapil.stocks.services.SharedPreferences
 import com.kapil.stocks.ui.bottomsheets.WatchListChooseBottomSheet
 import com.kapil.stocks.viewmodel.StockViewModel
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 class StockDetailsActivity : AppCompatActivity() {
 
@@ -58,6 +48,8 @@ class StockDetailsActivity : AppCompatActivity() {
         viewModel.fetchStockDetails(companyName)
     }
 
+    // In StockDetailsActivity.kt
+
     private fun setupListeners() {
         _binding.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -71,7 +63,6 @@ class StockDetailsActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             viewModel.isLoading.collect { isVisible ->
-                // ⭐ THIS IS THE CORRECTED LINE ⭐
                 if (isVisible == true) {
                     _binding.progressBar.visibility = View.VISIBLE
                     _binding.stockDetailContainer.visibility = View.GONE
@@ -85,18 +76,45 @@ class StockDetailsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.stockDetails.collect { data ->
                 if (data != null) {
+                    // --- EXISTING UI ELEMENTS ---
                     _binding.tvCompanyName.text = data.Name
                     _binding.tvSymbolExchange.text = "${data.Symbol}, ${data.Exchange}"
-                    _binding.tvPrice.text = "$${data.PERatio}"
+                    _binding.tvPrice.text = "$${data.PERatio}" // You might want to use a more accurate price field
                     _binding.tvDescription.text = data.Description
-                    _binding.tvSector.text = "Sector: ${data.Sector}"
                     _binding.tvIndustry.text = "Industry: ${data.Industry}"
+                    _binding.tvSector.text = "Sector: ${data.Sector}"
+                    _binding.tvAboutHeader.text = "About ${data.Name}"
+                    // You can add logic here for tvPriceChange if needed
+
+                    // --- NEW UI ELEMENTS ---
+
+                    // 52 Week Range
+                    _binding.tv52WeekLow.text = "$${data.`52WeekLow`}"
+                    _binding.tv52WeekHigh.text = "$${data.`52WeekHigh`}"
+
+                    // Logic for the progress bar
+                    val low = data.`52WeekLow`.toFloatOrNull() ?: 0f
+                    val high = data.`52WeekHigh`.toFloatOrNull() ?: 0f
+                    val current = data.PERatio.toFloatOrNull() ?: low // Using PE Ratio as a stand-in for price
+                    if (high > low) {
+                        val progress = ((current - low) / (high - low) * 100).toInt()
+                        _binding.priceRangeProgressBar.progress = progress
+                    }
+
+                    // Key Statistics
+                    _binding.tvMarketCapValue.text = data.MarketCapitalization
+                    _binding.tvPeRatioValue.text = data.PERatio
+                    _binding.tvBetaValue.text = data.Beta
+                    _binding.tvDividendYieldValue.text = data.DividendYield
+                    _binding.tvProfitMarginValue.text = data.ProfitMargin
+                    _binding.tvEpsValue.text = data.EPS
+
                     setupChart()
                 }
             }
         }
 
-        _binding.topAppBar.setNavigationOnClickListener{
+        _binding.topAppBar.setNavigationOnClickListener {
             finish()
         }
     }
