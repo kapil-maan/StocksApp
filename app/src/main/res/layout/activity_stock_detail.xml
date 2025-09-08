@@ -42,11 +42,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="8dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
                 app:strokeWidth="0dp">
 
@@ -71,26 +72,26 @@
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginStart="12dp"
+                            android:layout_weight="1"
                             android:orientation="vertical">
 
                             <TextView
                                 android:id="@+id/tvCompanyName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="APPLE INC"
                                 android:textColor="@color/text_primary"
                                 android:textSize="18sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                tools:text="APPLE INC" />
 
                             <TextView
                                 android:id="@+id/tvSymbolExchange"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="AAPL, Common Stock"
                                 android:textColor="@color/text_secondary"
-                                android:textSize="14sp" />
+                                android:textSize="14sp"
+                                tools:text="AAPL, Common Stock" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -103,18 +104,18 @@
                                 android:id="@+id/tvPrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="$177.15"
                                 android:textColor="@color/text_primary"
                                 android:textSize="18sp"
-                                android:textStyle="bold"/>
+                                android:textStyle="bold"
+                                tools:text="$177.15" />
 
                             <TextView
                                 android:id="@+id/tvPriceChange"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="+0.41%"
                                 android:textColor="@color/positive_green"
-                                android:textSize="14sp" />
+                                android:textSize="14sp"
+                                tools:text="+0.41%" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -130,7 +131,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
                 app:strokeWidth="0dp">
 
@@ -143,10 +144,118 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="About APPLE INC"
+                        android:text="52 Week Range"
                         android:textColor="@color/text_primary"
-                        android:textSize="18sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv52WeekLow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            tools:text="$123.64" />
+
+                        <ProgressBar
+                            android:id="@+id/priceRangeProgressBar"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="6dp"
+                            android:layout_marginHorizontal="16dp"
+                            android:layout_weight="1"
+                            android:progressDrawable="@drawable/custom_progress_bar"
+                            tools:progress="60" />
+
+                        <TextView
+                            android:id="@+id/tv52WeekHigh"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            tools:text="$197.96" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Key Statistics"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <GridLayout
+                        android:id="@+id/gridStats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:columnCount="2">
+
+                        <TextView style="@style/StatLabel" android:text="Market Cap" />
+                        <TextView android:id="@+id/tvMarketCapValue" style="@style/StatValue" tools:text="$2.77T" />
+
+                        <TextView style="@style/StatLabel" android:text="P/E Ratio" />
+                        <TextView android:id="@+id/tvPeRatioValue" style="@style/StatValue" tools:text="27.77" />
+
+                        <TextView style="@style/StatLabel" android:text="Beta" />
+                        <TextView android:id="@+id/tvBetaValue" style="@style/StatValue" tools:text="1.308" />
+
+                        <TextView style="@style/StatLabel" android:text="Dividend Yield" />
+                        <TextView android:id="@+id/tvDividendYieldValue" style="@style/StatValue" tools:text="0.54%" />
+
+                        <TextView style="@style/StatLabel" android:text="Profit Margin" />
+                        <TextView android:id="@+id/tvProfitMarginValue" style="@style/StatValue" tools:text="0.247" />
+
+                        <TextView style="@style/StatLabel" android:text="EPS" />
+                        <TextView android:id="@+id/tvEpsValue" style="@style/StatValue" tools:text="$9.80" />
+                    </GridLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvAboutHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        tools:text="About APPLE INC" />
 
                     <TextView
                         android:id="@+id/tvDescription"
@@ -154,9 +263,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:lineSpacingMultiplier="1.2"
-                        android:text="Apple Inc. is an American multinational technology company..."
                         android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        tools:text="Apple Inc. is an American multinational technology company..." />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -171,9 +280,9 @@
                             android:background="@drawable/search_bar_background"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            android:text="Industry: Electronic computers"
                             android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            tools:text="Industry: Electronic computers" />
 
                         <TextView
                             android:id="@+id/tvSector"
@@ -183,21 +292,12 @@
                             android:background="@drawable/search_bar_background"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            android:text="Sector: Technology"
                             android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            tools:text="Sector: Technology" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <GridLayout
-                android:id="@+id/gridStats"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:columnCount="3"
-                android:orientation="horizontal" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
