@@ -2,6 +2,7 @@ package com.kapil.stocks.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -44,6 +45,8 @@ class StockListActivity : AppCompatActivity() {
             watchListName = intent.getStringExtra(Constants.WATCHLIST_NAME)
         }
 
+        Log.d(Constants.TAG, "debug stock list activity $listType $watchListName")
+
         viewModel = ViewModelProvider(this)[StockListViewModel::class.java]
 
         setupAppBar()
@@ -71,6 +74,8 @@ class StockListActivity : AppCompatActivity() {
             val allWatchlists = SharedPreferences.readWatchlistData(this)
             val selectedWatchlist = allWatchlists.find { it.name == watchListName }
 
+            Log.d(Constants.TAG, "read watch list data $allWatchlists \n $selectedWatchlist")
+
             selectedWatchlist?.let {
                 // The adapter needs List<Stock>, but watchlist stores List<StockDetails>. We must map it.
                 val stockList = it.stocks.map { stockDetails ->
@@ -81,6 +86,7 @@ class StockListActivity : AppCompatActivity() {
                         changePercent = Random.nextDouble(0.1, 5.0)
                     )
                 }
+                Log.d(Constants.TAG, "stocklist map $stockList")
                 (binding.recyclerView.adapter as StockAdapter).updateData(stockList)
             }
         }
@@ -92,7 +98,10 @@ class StockListActivity : AppCompatActivity() {
         }
         lifecycleScope.launch {
             viewModel.stockDetails.collect { data ->
-                (binding.recyclerView.adapter as StockAdapter).updateData(data)
+                if(listType != STOCKS_LIST_TYPE.WATCHLIST){
+                    Log.d(Constants.TAG,"upating adapeter 11")
+                    (binding.recyclerView.adapter as StockAdapter).updateData(data)
+                }
             }
         }
     }

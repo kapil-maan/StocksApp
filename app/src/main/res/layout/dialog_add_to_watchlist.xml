@@ -19,6 +19,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:layout_marginBottom="8dp">
 
         <EditText
@@ -29,6 +31,14 @@
             android:hint="Create new watchlist..."
             android:inputType="textCapWords"
             android:maxLines="1" />
+
+        <Button
+            style="@style/Widget.Material3.Button.IconButton.Filled"
+            android:id="@+id/create_new_watchlist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:text="Add" />
 
     </LinearLayout>
 

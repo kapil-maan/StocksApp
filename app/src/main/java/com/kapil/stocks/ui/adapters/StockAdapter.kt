@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kapil.stocks.R
+import com.kapil.stocks.constants.Constants
 import com.kapil.stocks.data.model.Stock
 import kotlin.math.abs
 
@@ -43,6 +45,7 @@ class StockAdapter(private val onClick: (Stock) -> Unit) :
 
     fun updateData(list: List<Stock>){
         _data = list
+        Log.d(Constants.TAG, "bro in adpater $list")
         notifyDataSetChanged()
     }
 

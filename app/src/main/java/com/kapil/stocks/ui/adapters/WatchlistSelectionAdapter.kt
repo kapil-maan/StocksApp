@@ -1,16 +1,19 @@
 package com.kapil.stocks.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import com.kapil.stocks.R
+import com.kapil.stocks.constants.Constants
 import com.kapil.stocks.data.model.WatchList
 
-class WatchlistSelectionAdapter(private val watchlists: List<WatchList>) :
+class WatchlistSelectionAdapter() :
     RecyclerView.Adapter<WatchlistSelectionAdapter.ViewHolder>() {
 
+    private var _data: List<WatchList> = emptyList()
     val selectedWatchlistNames = mutableSetOf<String>()
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -24,8 +27,14 @@ class WatchlistSelectionAdapter(private val watchlists: List<WatchList>) :
         return ViewHolder(view)
     }
 
+    fun updateData(list: List<WatchList>) {
+        _data = list
+        Log.d(Constants.TAG, "bro in adpater $list")
+        notifyDataSetChanged()
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val watchlist = watchlists[position]
+        val watchlist = _data[position]
         holder.checkBox.text = watchlist.name
 
         // --- THE FIX IS HERE ---
@@ -46,5 +55,5 @@ class WatchlistSelectionAdapter(private val watchlists: List<WatchList>) :
         }
     }
 
-    override fun getItemCount() = watchlists.size
+    override fun getItemCount() = _data.size
 }

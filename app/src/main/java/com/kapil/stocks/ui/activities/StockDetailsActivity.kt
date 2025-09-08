@@ -25,6 +25,7 @@ import com.kapil.stocks.constants.Constants
 import com.kapil.stocks.data.model.WatchList
 import com.kapil.stocks.databinding.ActivityStockDetailBinding
 import com.kapil.stocks.services.SharedPreferences
+import com.kapil.stocks.ui.bottomsheets.WatchListChooseBottomSheet
 import com.kapil.stocks.viewmodel.StockViewModel
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -107,71 +108,22 @@ class StockDetailsActivity : AppCompatActivity() {
             return
         }
 
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.dialog_add_to_watchlist)
+        val bottomsheet = WatchListChooseBottomSheet(stockToAdd)
+        bottomsheet.show(supportFragmentManager, WatchListChooseBottomSheet.TAG)
 
-        val etNewWatchlistName = dialog.findViewById<EditText>(R.id.et_new_watchlist_name)
-        val rvExistingWatchlists = dialog.findViewById<RecyclerView>(R.id.rv_existing_watchlists)
-        val btnSave = dialog.findViewById<Button>(R.id.btn_save_to_watchlists)
-
-        val existingWatchlists = SharedPreferences.readWatchlistData(this)
-        val selectionAdapter = WatchlistSelectionAdapter(existingWatchlists)
-        rvExistingWatchlists.layoutManager = LinearLayoutManager(this)
-        rvExistingWatchlists.adapter = selectionAdapter
+//        val etNewWatchlistName = dialog.findViewById<EditText>(R.id.et_new_watchlist_name)
+//        val rvExistingWatchlists = dialog.findViewById<RecyclerView>(R.id.rv_existing_watchlists)
+//        val btnSave = dialog.findViewById<Button>(R.id.btn_save_to_watchlists)
+//
+//        val existingWatchlists = SharedPreferences.readWatchlistData(this)
+//        val selectionAdapter = WatchlistSelectionAdapter(existingWatchlists)
+//        rvExistingWatchlists.layoutManager = LinearLayoutManager(this)
+//        rvExistingWatchlists.adapter = selectionAdapter
 
         // In StockDetailsActivity.kt
 
-        btnSave.setOnClickListener {
-            val selectedNames = selectionAdapter.selectedWatchlistNames
-            val newName = etNewWatchlistName.text.toString().trim()
-            if (newName.isNotEmpty()) {
-                selectedNames.add(newName)
-            }
 
-            if (selectedNames.isEmpty()) {
-                Toast.makeText(this, "Please select or create a watchlist.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val watchlistsMap = SharedPreferences.readWatchlistData(this)
-                .associateBy { it.name.lowercase(Locale.ROOT) }
-                .toMutableMap()
-
-            for (targetName in selectedNames) {
-                val key = targetName.lowercase(Locale.ROOT)
-                val existingList = watchlistsMap[key]
-
-                if (existingList != null) {
-                    // --- ⭐ THIS IS THE CORRECTED LOGIC ⭐ ---
-                    val stockAlreadyExists = existingList.stocks.any { it.Symbol == stockToAdd.Symbol }
-                    if (!stockAlreadyExists) {
-                        // Only update the list IF the stock is NOT already in it
-                        val updatedList = existingList.copy(stocks = existingList.stocks + stockToAdd)
-                        watchlistsMap[key] = updatedList
-                    }
-                    // If the stock already exists, we do nothing, preventing duplicates.
-
-                } else {
-                    // NEW WATCHLIST: Create it and add it to the map.
-                    val newList = WatchList(name = targetName, stocks = listOf(stockToAdd))
-                    watchlistsMap[key] = newList
-                }
-            }
-
-            val finalListToSave = watchlistsMap.values.toList()
-
-            // (Optional but Recommended) Add the debug log from the previous step to always check what you're saving
-            Log.d("WATCHLIST_DEBUG", "--- FINAL LIST TO SAVE ---")
-            finalListToSave.forEach { watchlist ->
-                Log.d("WATCHLIST_DEBUG", "Name: ${watchlist.name}, Stocks: ${watchlist.stocks.map { it.Symbol }.distinct()}") // Using distinct() for cleaner logging
-            }
-
-            SharedPreferences.saveWatchlistData(this, finalListToSave)
-
-            Toast.makeText(this, "Saved to watchlist(s)!", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-        }
-        dialog.show()
+//        dialog.show()
     }
 
     private fun setupChart() {

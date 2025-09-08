@@ -46,6 +46,13 @@ class MainActivity : AppCompatActivity() {
         setupSearch()
     }
 
+    override fun onStart() {
+        super.onStart()
+        // Highlight the Home Bottom Tab
+        binding.bottomNavigation.selectedItemId = R.id.nav_home
+    }
+
+
     private fun setupSearch() {
         searchAdapter = StockAdapter { stock ->
             navigateToDetailActivity(stock.name)
