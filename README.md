@@ -7,7 +7,7 @@ This app allows users to track stock prices, view top gainers & losers, add stoc
 
 ## 🚀 Demo
 
-![giphy](https://github.com/user-attachments/assets/47db577e-f94d-43f5-a5ba-f0e5ef35c057)
+![Demo](assets/stocks.gif)
 
 ---
 
